@@ -1,0 +1,38 @@
+Develop a program to apply data augmentation (rotation, flipping, zoom) on a image dataset.
+
+# Import necessary libraries
+import tensorflow as tf                                # TensorFlow for machine learning operations
+from tensorflow.keras.preprocessing.image import ImageDataGenerator  # Image augmentation library
+import matplotlib.pyplot as plt                         # Library to visualize images
+
+# Load the CIFAR-10 dataset (Preloaded Dataset in TensorFlow)
+# CIFAR-10 contains 60,000 images of 10 classes with size 32x32 pixels
+(x_train, y_train), (_, _) = tf.keras.datasets.cifar10.load_data()
+
+# Normalize the image data to range [0, 1]
+# This helps improve the performance of models
+x_train = x_train / 255.0
+
+# Define the Data Augmentation process using ImageDataGenerator
+datagen = ImageDataGenerator(
+    rotation_range=20,       # Rotates the image randomly between -20 to +20 degrees
+    horizontal_flip=True,    # Flips the image horizontally (left to right)
+    zoom_range=0.2           # Zooms the image randomly by 20%
+)
+
+# Fit the ImageDataGenerator to the dataset
+# It prepares the generator to apply augmentations on the dataset
+datagen.fit(x_train)
+
+# Display Augmented Images
+plt.figure(figsize=(10, 10))  # Set the plot size
+
+# Generate a batch of 9 images with augmentation
+for X_batch, y_batch in datagen.flow(x_train, y_train, batch_size=9, shuffle=False):
+    # Loop through 9 images in the batch
+    for i in range(0, 9):
+        plt.subplot(3, 3, i+1)  # Create a grid of 3x3
+        plt.imshow(X_batch[i])  # Display the augmented image
+        plt.axis('off')         # Hide the axis to make the image look clear
+    plt.show()                 # Show the 9 images at once
+    break                      # Stop after displaying one batch of images
