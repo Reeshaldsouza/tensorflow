@@ -1,0 +1,65 @@
+Develop a program to build a 2D CNN to classify images from the CIFAR-10 dataset.
+
+# Step 1: Import Required Libraries
+import tensorflow as tf  # TensorFlow for building and training the model
+from tensorflow.keras import layers, models  # Layers and models for defining the CNN
+import matplotlib.pyplot as plt  # Matplotlib for plotting training results
+
+# Step 2: Load and Preprocess the CIFAR-10 Dataset
+# Load the CIFAR-10 dataset, which contains 60,000 32x32 color images in 10 classes
+(x_train, y_train), (x_test, y_test) = tf.keras.datasets.cifar10.load_data()
+
+# Normalize pixel values to the range [0, 1] by dividing by 255
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+
+# Step 3: Define the CNN Model
+model = models.Sequential([  # Sequential model is a linear stack of layers
+    # First convolutional layer: 32 filters, each of size 3x3, with ReLU Rectified Linear Unit activation
+    layers.Conv2D(32, (3, 3), activation='relu', input_shape=(32, 32, 3)),
+    # Max-pooling layer with a 2x2 window to reduce spatial dimensions
+    layers.MaxPooling2D((2, 2)),
+
+    # Second convolutional layer: 64 filters, each of size 3x3, with ReLU activation
+    layers.Conv2D(64, (3, 3), activation='relu'),
+    # Another max-pooling layer with a 2x2 window
+    layers.MaxPooling2D((2, 2)),
+
+    # Third convolutional layer: 64 filters, each of size 3x3, with ReLU activation
+    layers.Conv2D(64, (3, 3), activation='relu'),
+
+    # Flatten the 3D output from the convolutional layers into a 1D vector
+    layers.Flatten(),
+
+    # Fully connected (dense) layer with 64 units and ReLU activation
+    layers.Dense(64, activation='relu'),
+
+    # Output layer with 10 units (one for each class) and softmax activation
+    layers.Dense(10, activation='softmax')
+])
+
+# Step 4: Compile the Model
+# Compile the model with the Adam optimizer, sparse categorical cross-entropy loss, and accuracy metric
+model.compile(optimizer='adam',
+              loss='sparse_categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Step 5: Train the Model
+# Train the model for 10 epochs using the training data and validate it on the test data
+history = model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test))
+
+# Step 6: Evaluate the Model
+# Evaluate the model on the test data and print the test accuracy
+test_loss, test_acc = model.evaluate(x_test, y_test, verbose=2)
+print(f"\nTest Accuracy: {test_acc:.4f}")
+
+# Step 7: Plot Training History
+# Plot the training and validation accuracy over epochs
+plt.plot(history.history['accuracy'], label='Train Accuracy')  # Training accuracy
+plt.plot(history.history['val_accuracy'], label='Val Accuracy')  # Validation accuracy
+plt.title('Model Accuracy')  # Title of the plot
+plt.xlabel('Epoch')  # X-axis label
+plt.ylabel('Accuracy')  # Y-axis label
+plt.legend()  # Show legend
+plt.grid(True)  # Add grid for better readability
+plt.show()  # Display the plot
