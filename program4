@@ -1,0 +1,76 @@
+Develop a program using TensorFlow to preprocess (normalization and splitting) a dataset and analyse its features.
+
+# Step 1: Import Libraries
+# Import TensorFlow for machine learning (though not directly used here, it's included for compatibility)
+import tensorflow as tf
+# Import pandas for data manipulation and analysis
+import pandas as pd
+# Import numpy for numerical computations
+import numpy as np
+# Import matplotlib.pyplot for creating visualizations
+import matplotlib.pyplot as plt
+# Import seaborn for statistical data visualization
+import seaborn as sns
+# Import train_test_split to split the dataset into training and testing sets
+from sklearn.model_selection import train_test_split
+# Import MinMaxScaler to normalize the data
+from sklearn.preprocessing import MinMaxScaler
+# Import load_iris to load the Iris dataset
+from sklearn.datasets import load_iris
+
+
+# Step 2: Load Dataset
+# Load the Iris dataset into the variable 'iris'
+iris = load_iris()
+# Convert the dataset into a pandas DataFrame for easier manipulation
+# iris.data contains the feature values, and iris.feature_names provides the column names
+df = pd.DataFrame(iris.data, columns=iris.feature_names)
+# Add a new column 'species' to the DataFrame, which contains the target variable (species of the iris flowers)
+df['species'] = iris.target
+
+
+# Display the first 5 rows of the dataset
+# This helps us get a quick look at the dataset
+print("Dataset Sample:\n", df.head())
+
+# Display basic statistics of the dataset
+# This provides summary statistics like count, mean, standard deviation, min, max, and quartiles
+print("\nSummary Statistics:\n", df.describe())
+
+
+# Step 3: Normalize Data
+# Separate the features (independent variables) from the DataFrame
+# We drop the 'species' column to get only the features
+X = df.drop('species', axis=1)  # Features
+# Extract the target variable (dependent variable) from the DataFrame
+y = df['species']               # Target
+
+# Create an instance of MinMaxScaler to normalize the data
+scaler = MinMaxScaler()
+# Normalize the feature values to a range of [0, 1]
+# fit_transform() calculates the minimum and maximum values and scales the data
+X_normalized = scaler.fit_transform(X)
+
+
+# Step 4: Split Dataset into Training and Testing Sets
+# Split the dataset into training and testing sets
+# X_normalized: normalized features
+# y: target variable
+# test_size=0.2: 20% of the data will be used for testing, and 80% for training
+# random_state=42: Ensures the split is reproducible (same split every time the code is run)
+X_train, X_test, y_train, y_test = train_test_split(X_normalized, y, test_size=0.2, random_state=42)
+
+# Print the number of samples in the training and testing sets
+print("\nTraining Samples:", X_train.shape[0])
+print("Testing Samples:", X_test.shape[0])
+
+
+# Step 5: Feature Analysis (Visualization)
+# Create a pairplot to visualize relationships between features
+# pairplot() creates a grid of scatterplots for each pair of features
+# hue='species': Colors the points based on the species, making it easier to see patterns
+sns.pairplot(df, hue='species')
+# Add a title to the plot
+plt.title("Feature Distribution by Species")
+# Display the plot
+plt.show()
