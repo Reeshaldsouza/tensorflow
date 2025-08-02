@@ -1,0 +1,77 @@
+Develop a program to create a custom dataset of numbers (0-99) with labels indicating odd/even. Train a neural network to classify numbers as odd or even.
+
+# Step 1: Import Required Libraries
+# TensorFlow is a deep learning framework used for building and training neural networks.
+# Keras provides a high-level API to simplify neural network implementation.
+# NumPy is a numerical library for handling arrays efficiently.
+# Scikit-learn is used for splitting datasets into training and testing subsets.
+
+import tensorflow as tf  # Import TensorFlow for building neural networks
+from tensorflow.keras.models import Sequential  # Import Sequential model (stack of layers)
+from tensorflow.keras.layers import Dense  # Import Dense (fully connected) layers
+import numpy as np  # Import NumPy for numerical operations
+from sklearn.model_selection import train_test_split  # Import train_test_split to divide data into training/testing sets
+
+# Step 2: Create the Dataset
+# We generate numbers from 0 to 99 and classify them as odd or even.
+# - Even numbers are labeled as 0
+# - Odd numbers are labeled as 1
+
+numbers = np.arange(0, 100)  # Generate numbers from 0 to 99
+labels = np.array([1 if num % 2 != 0 else 0 for num in numbers])  # Assign label 1 for odd, 0 for even
+
+# Step 3: Preprocess the Data
+# - Neural networks work best with normalized inputs, so we scale the numbers to a range of 0 to 1.
+# - We reshape the data to ensure it has the correct structure for TensorFlow (column vector).
+
+numbers = numbers / 99.0  # Normalize numbers to a range of 0 to 1
+numbers = numbers.reshape(-1, 1)  # Reshape data to have one feature per input
+
+# Step 4: Split the Dataset into Training and Testing Sets
+# - We use an 80-20 split: 80% of the data for training, 20% for testing.
+# - A random state ensures consistent shuffling of data each time the code is run.
+
+train_x, test_x, train_y, test_y = train_test_split(numbers, labels, test_size=0.2, random_state=42)
+
+# Step 5: Build the Neural Network Model
+# - The model consists of:
+#   1. An input layer (implicitly defined)
+#   2. A hidden layer with 10 neurons and ReLU activation function
+#   3. An output layer with 1 neuron and a Sigmoid activation function for binary classification
+
+model = Sequential([
+    Dense(10, activation='relu', input_shape=(1,)),  # Hidden layer with 10 neurons & ReLU activation
+    Dense(1, activation='sigmoid')  # Output layer with 1 neuron & Sigmoid activation for binary classification
+])
+
+# Step 6: Compile the Model
+# - The optimizer "adam" adapts learning rates for efficient training.
+# - "binary_crossentropy" is used for loss calculation in binary classification tasks.
+# - "accuracy" metric is tracked to monitor performance during training.
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Step 7: Train the Model
+# - The model is trained for 50 epochs (iterations over the entire dataset).
+# - A batch size of 4 is used to update model weights after every 4 samples.
+# - "verbose=1" ensures training progress is displayed.
+
+model.fit(train_x, train_y, epochs=50, batch_size=4, verbose=1)
+
+# Step 8: Evaluate the Model on the Test Set
+# - The model is tested on unseen data to measure its generalization ability.
+# - "evaluate" returns the loss and accuracy values.
+
+loss, accuracy = model.evaluate(test_x, test_y)  # Evaluate model performance on test data
+print(f"\nTest Accuracy: {accuracy * 100:.2f}%")  # Print test accuracy in percentage format
+
+# Step 9: Make Predictions on a Sample Input
+# - We test the model on a sample number (e.g., 45) to determine if it is odd or even.
+# - The number is normalized and reshaped before prediction.
+
+sample_number = np.array([45]) / 99.0  # Normalize input (45 → 0.4545)
+sample_number = sample_number.reshape(-1, 1)  # Reshape for model compatibility
+prediction = model.predict(sample_number)  # Get prediction probability
+
+# Convert probability to Odd/Even label and print result
+print(f"Prediction for 45: {'Odd' if prediction > 0.5 else 'Even'} (Confidence: {prediction[0][0]:.2f})")
