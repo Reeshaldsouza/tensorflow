@@ -1,0 +1,59 @@
+Develop a program that loads the MNIST dataset (handwritten digits) from TensorFlow.Train a model to classify digits using ANN and evaluate its accuracy.
+
+
+# Import necessary libraries from TensorFlow and other modules
+import tensorflow as tf
+from tensorflow.keras.models import Sequential             # Used to create a linear stack of layers
+from tensorflow.keras.layers import Dense, Flatten         # Dense: fully connected layer, Flatten: flattens input
+from tensorflow.keras.datasets import mnist                # MNIST dataset of handwritten digits (0-9)
+from tensorflow.keras.utils import to_categorical          # Converts labels to one-hot encoded format
+
+# Step 1: Load the MNIST dataset (60,000 training and 10,000 test images of 28x28 pixels)
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+# Step 2: Normalize the input data
+# Pixel values range from 0 to 255. Divide by 255 to scale them between 0 and 1 for faster training.
+x_train = x_train / 255.0
+x_test = x_test / 255.0
+
+# Step 3: Convert class labels (0 to 9) to one-hot encoded vectors
+# For example, label 3 becomes [0 0 0 1 0 0 0 0 0 0]
+y_train = to_categorical(y_train, 10)
+y_test = to_categorical(y_test, 10)
+
+# Step 4: Build the Artificial Neural Network (ANN) model using Sequential API
+model = Sequential([
+    Flatten(input_shape=(28, 28)),         # Converts each 28x28 image into a 784-dimensional vector
+    Dense(128, activation='relu'),         # First hidden layer with 128 neurons and ReLU activation(Rectified Linear Unit)
+    Dense(64, activation='relu'),          # Second hidden layer with 64 neurons and ReLU activation
+    Dense(10, activation='softmax')        # Output layer with 10 neurons (for 10 digit classes), softmax gives probabilities
+])
+
+# Step 5: Compile the model
+# Optimizer: Adam (adaptive learning rate)
+# Loss function: categorical_crossentropy (used for multi-class classification)
+# Metrics: accuracy (to track performance)
+model.compile(optimizer='adam',
+              loss='categorical_crossentropy',
+              metrics=['accuracy'])
+
+# Step 6: Train the model on training data
+# Train for 10 epochs, using 32 samples in each batch
+# validation_split=0.1 means 10% of training data is used for validation during training
+model.fit(x_train, y_train, epochs=10, batch_size=32, validation_split=0.1)
+
+# Step 7: Evaluate the trained model on the test dataset
+# This gives the loss and accuracy on unseen test data
+test_loss, test_accuracy = model.evaluate(x_test, y_test)
+print(f"\nTest Accuracy: {test_accuracy * 100:.2f}%")
+
+# Step 8 (Optional): Predict and compare model output on first 5 test samples
+import numpy as np
+
+predictions = model.predict(x_test)   # Predict the class probabilities for test images
+
+# Display predicted and actual labels for first 5 test samples
+for i in range(5):
+    predicted_label = np.argmax(predictions[i])   # Convert predicted probabilities to actual class label
+    actual_label = np.argmax(y_test[i])           # Get the original class label from one-hot encoded format
+    print(f"Sample {i+1}: Predicted = {predicted_label}, Actual = {actual_label}")
