@@ -1,0 +1,14 @@
+import tensorflow as tf
+# Define input values (simulating sensor data)
+a = tf.constant(10.0)  # Replace with actual sensor data
+b = tf.constant(5.0)    # Replace with actual sensor data
+c = tf.constant(3.0)    # Replace with actual sensor data
+# Perform mathematical operations
+result_subtraction = a - b  # a - b
+result_complex_op = (a + b) * (c - 1)  # (a + b) * (c - 1)
+# Print the results
+print("Sensor A:", a.numpy())
+print("Sensor B:", b.numpy())
+print("Sensor C:", c.numpy())
+print("a - b:", result_subtraction.numpy())
+print("(a + b) * (c - 1):", result_complex_op.numpy())
